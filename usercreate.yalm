@@ -1,0 +1,31 @@
+---
+
+- name: Configure Debian Personal Preferences
+  hosts: localhost
+  connection: local
+  become: true
+
+  vars:
+    target_username: "dion"
+
+  vars_prompt:
+    - name: target_password
+      prompt: "miau"
+      private: yes
+      confirm: yes
+
+  tasks:
+    - name: Ensure sudo package is installed
+      ansible.builtin.package:
+        name: sudo
+        state: present
+
+    - name: Create personal user account
+      ansible.builtin.user:
+        name: "{{ target_username }}"
+        password: "{{ target_password | password_hash('sha512') }}"
+        shell: /bin/bash
+        groups: sudo
+        append: yes
+        state: present
+        create_home: yes
